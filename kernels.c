@@ -347,7 +347,7 @@ static pixel avg(int dim, int i, int j, pixel *src)
 {
 	int ii, jj;
 	pixel_sum sum;
-	pixel_sum*sum2 = &sum;
+	// pixel_sum*sum2 = &sum;
 	
 	pixel current_pixel;
 	pixel* curPix = &current_pixel;
