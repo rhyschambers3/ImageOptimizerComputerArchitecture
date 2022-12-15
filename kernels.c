@@ -38,10 +38,10 @@ static __inline__ unsigned long long rdtsc(void)
  * Please fill in the following team struct 
  */
 team_t team = {
-    "joe",              /* Team name */
+    "Rhys",              /* Team name */
 
-    "Harry Q. Bovik",     /* First member full name */
-    "bovik@nowhere.edu",  /* First member email address */
+    "Rhys Chambers",     /* First member full name */
+    "rhyschambers@gwu.edu",  /* First member email address */
 
     "",                   /* Second member full name (leave blank if none) */
     ""                    /* Second member email addr (leave blank if none) */
@@ -123,9 +123,152 @@ void my_rotate(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 
 /* ANY CHANGES ARE MADE HERE */
 /* below are the main computations for your implementation of the rotate. Any changes in implementation will go here or the other functions it may call */
-	for (j = 0; j < dim; j++)
-		for (i = 0; i < dim; i++)
-			dst[RIDX(dim-1-j, i, dim)] = src[RIDX(i, j, dim)];
+	// int dimsqrd = dim*dim;
+	// dst[(dim*(dim-1))] = src[dim + 1]; //first one
+
+	// for (j = 0; j < dim; j++)
+	// 	for (i = 0; i < dim; i++)
+			// dst[(dim*(dim-1)) + (i* (dim - 1))] = src[(dim + 1) * (i*(dim + 1))]; //second trial, trying to inline function and expand
+			//dst[dimSqrd - dim]
+			
+			// dst[RIDX(dim-1-j, i, dim)] = src[RIDX(i, j, dim)];
+				// k = 2;
+			// while(k <= 30){
+            // *(dst + k) = *src;
+            // src += dim;
+			// k--;
+			// }
+
+    int dimSqrd = dim*dim;
+
+    dst += dimSqrd- dim;
+    for (i = 0; i < dim; i += 32)
+    { 
+            for (j = 0; j < dim; j++)
+            { 
+                *dst = *src;
+                src += dim;
+
+                *(dst + 1) = *src;
+                src += dim;
+
+                *(dst + 2) = *src;
+                src += dim;
+
+                *(dst + 3) = *src;
+                src += dim;
+
+                *(dst + 4) = *src;
+                src += dim;
+
+                *(dst + 5) = *src;
+                src += dim;
+
+                *(dst + 6) = *src;
+                src += dim;
+
+                *(dst + 7) = *src;
+                src += dim;
+
+                *(dst + 8) = *src;
+                src += dim;
+
+                *(dst + 9) = *src;
+                src += dim;
+
+                *(dst + 10) = *src;
+                src += dim;
+
+                *(dst + 11) = *src;
+                src += dim;
+
+                *(dst + 12) = *src;
+                src += dim;
+
+                *(dst + 13) = *src;
+                src += dim;
+
+                *(dst + 14) = *src;
+                src += dim;
+
+                *(dst + 15) = *src;
+                src += dim;
+
+                *(dst + 16) = *src;
+                src += dim;
+
+                *(dst + 17) = *src;
+                src += dim;
+
+                *(dst + 18) = *src;
+                src += dim;
+
+                *(dst + 19) = *src;
+                src += dim;
+
+                *(dst + 20) =* src;
+                src += dim;
+
+                *(dst + 21) =* src;
+                src += dim;
+
+                *(dst + 22) =* src;
+                src += dim;
+
+                *(dst + 23) =* src;
+                src += dim;
+
+                *(dst + 24) =* src;
+                src += dim;
+
+                *(dst + 25) =* src;
+                src += dim;
+
+                *(dst + 26) =* src;
+                src += dim;
+
+                *(dst + 27) =* src;
+                src += dim;
+
+                *(dst + 28) =* src;
+                src += dim;
+
+                *(dst +29) = *src;
+                src += dim;
+
+                *(dst + 30) = * src;
+                src += dim; 
+
+                *(dst + 31) = * src;
+
+                 dst -=dim;
+                src -= dim*31 - 1;
+            }
+            
+			
+		dst += 32 + dimSqrd;
+        src += dim*31;
+        }
+ 
+	//trial and error
+
+	// int dimSqrd = dim*(dim);
+	// // int k;
+	// dst += dimSqrd  - dim;
+	// for (i = 0; i < dim; i += 32){
+	// 	// int dimSqrd = dim*(dim); moved to above, originally did not work
+	// 	// dst += dimSqrd  - dim;
+	// 	for (j = 0; j < dim; j++){
+	// 		*dst = *src;
+    //         src += dim;
+			
+			// k = 2;
+			// while(k <= 30){
+            // *(dst + k) = *src;
+            // src += dim;
+			// k--;
+			// }
+
 
 
 /* end of computation for rotate function. any changes you make should be made above this line. */
@@ -138,9 +281,6 @@ void my_rotate(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 	*rusage_time = rusage_end_time - rusage_start_time;
 	*rdtsc_time = rdtsc_end_time - rdtsc_start_time;
 }
-
-
-
 
 
 /***************
@@ -161,10 +301,10 @@ typedef struct {
 } pixel_sum;
 
 /* Compute min and max of two integers, respectively */
-static int minimum(int a, int b) 
-{ return (a < b ? a : b); }
-static int maximum(int a, int b) 
-{ return (a > b ? a : b); }
+// static int minimum(int a, int b) 
+// { return (a < b ? a : b); }
+// static int maximum(int a, int b) 
+// { return (a > b ? a : b); }
 
 /* 
  * initialize_pixel_sum - Initializes all fields of sum to 0 
@@ -207,15 +347,61 @@ static pixel avg(int dim, int i, int j, pixel *src)
 {
 	int ii, jj;
 	pixel_sum sum;
+	pixel_sum*sum2 = &sum;
+	
 	pixel current_pixel;
+	pixel* curPix = &current_pixel;
 
-	initialize_pixel_sum(&sum);
-	for(ii = maximum(i-1, 0); ii <= minimum(i+1, dim-1); ii++) 
-		for(jj = maximum(j-1, 0); jj <= minimum(j+1, dim-1); jj++) 
-			accumulate_sum(&sum, src[RIDX(ii, jj, dim)]);
+	// pixel p;
 
-	assign_sum_to_pixel(&current_pixel, sum);
+	
+	//inlined function
+	sum.red = sum.green = sum.blue = 0;
+	sum.num = 0;
+	
+	// initialize_pixel_sum(&sum);
+	// for(jj = ((j-1) > 0 ? (j-1) : 0); jj <= (j+1 < dim -1 ? j+1 : dim-1); jj++)
+		
+		// ii = maximum(i-1, 0); ii <= minimum(i+1, dim-1); ii++) 
+			for(jj = ((j-1) > 0 ? (j-1) : 0); jj <= (j+1 < dim -1 ? j+1 : dim-1); jj++){
+				for(ii = ((i-1) > 0 ? (i-1) : 0); ii <= (i+1 < dim -1 ? i+1 : dim-1); ii++){
+				// jj = maximum(j-1, 0); jj <= minimum(j+1, dim-1); jj++) 
+
+				// p = src[RIDX(ii, jj, dim)];
+
+				// sum2->red += (int) p.red;
+				// sum2->green += (int)p.green;
+				// sum2->blue += (int) p.blue;
+				// sum2->num++;
+
+					// sum2->red += (int) p.red;
+					// sum2->green += (int) p.green;
+					// sum2->blue += (int) p.blue;
+					// sum2->num++;
+			
+				accumulate_sum(&sum, src[RIDX(ii, jj, dim)]);
+				// ridxScore = ((ii)*(dim)+(jj));
+				
+				// sum.red += (int) src[RIDX(ii, jj, dim)].red;
+
+				// sum.green += (int) src[RIDX(ii, jj, dim)].green;
+
+
+				// sum.blue += (int) src[RIDX(ii, jj, dim)].blue;
+
+			
+
+
+				// p = src[((ii)*(dim)+(jj))];
+				}
+			}
+
+	// assign_sum_to_pixel(&current_pixel, sum);
+	curPix->red = (unsigned short) (sum.red/sum.num);
+	curPix->green = (unsigned short) (sum.green/sum.num);
+	curPix->blue = (unsigned short) (sum.blue/sum.num);
 	return current_pixel;
+
 }
 
 /******************************************************
@@ -254,13 +440,19 @@ void naive_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned lo
 	*rdtsc_time = rdtsc_end_time - rdtsc_start_time;
 }
 
+
+
+
+
+
+
  /* The parameters, pointers, rusage_time, rdtsc_time, and cpu_time_used are used to measure performance and return values to caller. */
  /* You should not change the code that uses these parameters and variables. */
  
 char my_smooth_descr[] = "my_smooth: Naive baseline implementation";
 void my_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long long *rdtsc_time) 
 {
-	int i, j;
+
 	
 	/* the variables below are used for performance measurement and not for computing the results of the algorithm */
 	long int rusage_start_time, rusage_end_time = 0;
@@ -271,10 +463,58 @@ void my_smooth(int dim, pixel *src, pixel *dst, int *rusage_time, unsigned long 
 	
 /* ANY CHANGES TO BE MADE SHOULD BE BELOW HERE */
 /* below are the main computations for your implementation of the smooth function. Any changes in implementation will go here or the other functiosn it calls */
+	int i, j;
+	int ii, jj;
+	                                                                                    
+	pixel_sum sum;
+	
+	// pixel_sum *sumAcc;
+	// pixel p;
+	static pixel current_pixel;
+	pixel* curPix;
+	curPix = &current_pixel;
+	pixel_sum *sumAcc = &sum;
 
-	for (j = 0; j < dim; j++)
-		for (i = 0; i < dim; i++)
-			dst[RIDX(i, j, dim)] = avg(dim, i, j, src);
+	for (j = 0; j < dim; j++){
+		for (i = 0; i < dim; i++){
+			// sum2 = &sum;
+			sum.red = sum.green = sum.blue = 0;
+			sum.num = 0;
+			for(jj = ((j-1) > 0 ? (j-1) : 0); jj <= (j+1 < dim -1 ? j+1 : dim-1); jj++){
+				for(ii = ((i-1) > 0 ? (i-1) : 0); ii <= (i+1 < dim -1 ? i+1 : dim-1); ii++){
+	
+					// pixel_sum *sumAcc = &sum;
+					pixel p =  src[((ii*dim)+jj)]; //RIDX(ii, jj, dim)];
+
+					sumAcc->red += (int) p.red;
+					sumAcc->green += (int) p.green;
+					sumAcc->blue += (int) p.blue;
+					sumAcc->num++;
+				}
+			}
+		
+
+			curPix->red = (unsigned short) (sum.red/sum.num);
+			curPix->green = (unsigned short) (sum.green/sum.num);
+			curPix->blue = (unsigned short) (sum.blue/sum.num);
+			dst[((i*dim)+j)] = current_pixel;
+		
+		}
+	}
+		// 	for(ii = 0; ii <=  dim-1; ii++){
+		// 		for(jj = 0; jj <= dim-1; jj++){
+		// 			accumulate_sum(&sum, src[RIDX(ii, jj, dim)]);
+		// 		}
+		// 			curPix->red = (unsigned short) (sum.red/sum.num);
+		// 			curPix->green = (unsigned short) (sum.green/sum.num);
+		// 			curPix->blue = (unsigned short) (sum.blue/sum.num);
+				
+		// 	}
+
+		// 	dst[RIDX(i, j, dim)] = current_pixel; //avg(dim, i, j, src); // 
+		// }
+	
+				
 
 /* end of computation for smooth function. so don't change anything after this in this function. */
 /* END OF CHANGES */
