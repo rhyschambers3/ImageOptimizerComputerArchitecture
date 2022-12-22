@@ -1,0 +1,1 @@
+code 30/30  29/30  excellent report…one mistake – RIDX macro substitution is not the same as function inlining.
